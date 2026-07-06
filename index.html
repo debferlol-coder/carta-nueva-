@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para el amor de mi vida</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Montserrat:wght@300;400;600&family=Pinyon+Script&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- CONFIGURACIÓN BASE --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            background: radial-gradient(circle at center, #2c0b4d 0%, #0d021a 100%);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            min-height: 100vh;
+            padding: 30px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            cursor: none; /* Oculta el mouse para usar la mariposa */
+        }
+        
+        /* Asegura que los elementos interactivos hereden la desaparición del mouse */
+        a, button, .btn-empezar, .btn-next {
+            cursor: none !important;
+        }
+
+        /* --- FONDO MÁGICO ESTRELLADO --- */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 40px),
+                radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 30px),
+                radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 20px);
+            background-size: 550px 550px, 350px 350px, 250px 250px;
+            background-position: 0 0, 40px 60px, 130px 270px;
+            opacity: 0.35;
+            z-index: -1;
+        }
+
+        /* --- CONTENEDOR CENTRAL --- */
+        .container {
+            max-width: 750px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* --- ENCABEZADOS REFINADOS --- */
+        .header-title {
+            font-family: 'Caveat', cursive;
+            font-size: 3.8rem;
+            color: #ffd700;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            margin-bottom: 2px;
+        }
+        .header-subtitle {
+            font-family: 'Pinyon Script', cursive;
+            font-size: 4.5rem;
+            color: #ffd700;
+            line-height: 0.7;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+        .intro-text {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #e0d5ed;
+            max-width: 520px;
+            margin: 0 auto 30px auto;
+        }
+
+        /* --- BOTONES DE VIAJE --- */
+        .btn-empezar {
+            background: linear-gradient(90deg, #f3a152, #eec367);
+            color: #31065a;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            box-shadow: 0 0 20px rgba(238, 195, 103, 0.5);
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        .btn-empezar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 35px rgba(238, 195, 103, 0.8);
+        }
+        .song-info {
+            font-size: 0.85rem;
+            color: #b59fcc;
+            margin-bottom: 50px;
+        }
+
+        /* --- CARTAS (PASOS) INTERACTIVAS --- */
+        .step-card {
+            display: none; /* JavaScript las revela */
+            background: rgba(20, 5, 38, 0.85);
+            border: 2px solid #662d91;
+            border-radius: 18px;
+            margin-bottom: 40px;
+            padding: 30px;
+            text-align: left;
+            box-shadow: 0 0 30px rgba(102, 45, 145, 0.4);
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.215, 0.610, 0.355, 1);
+        }
+        .step-card.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card-flex {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+        .card-flex.reverse {
+            flex-direction: row-reverse;
+        }
+
+        .step-badge {
+            color: #ff99ff;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+        }
+
+        /* --- CONTENEDORES DE FOTOS --- */
+        .photo-container {
+            flex: 1;
+            max-width: 50%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            background: #1a082e; /* Fondo por si la foto tarda en cargar */
+            aspect-ratio: 4 / 5;
+        }
+        .photo-container img {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* --- TEXTOS INTERNOS --- */
+        .text-container {
+            flex: 1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #f0e6ff;
+        }
+        .text-highlight-cursive {
+            font-family: 'Caveat', cursive;
+            font-size: 2.4rem;
+            color: #ffb3ff;
+            line-height: 1.1;
+            margin-bottom: 15px;
+        }
+        .text-gold {
+            color: #eed67c;
+            text-align: center;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+        .text-footer-cursive {
+            font-family: 'Caveat', cursive;
+            font-size: 2.2rem;
+            color: #ff66cc;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* --- BOTÓN DE CONTINUAR --- */
+        .btn-next {
+            display: block;
+            margin: 25px auto 0 auto;
+            background: transparent;
+            border: 1.5px solid #ff99ff;
+            color: #ff99ff;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-next:hover {
+            background: #ff99ff;
+            color: #130424;
+            box-shadow: 0 0 15px rgba(255, 153, 255, 0.5);
+        }
+
+        /* --- PIE DE PÁGINA FINAL --- */
+        .final-footer {
+            display: none;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            color: #eed67c;
+            font-style: italic;
+            animation: fadeIn 1.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        /* --- MÁGICA MARIPOSA Y DESTELLOS (CURSOR) --- */
+        #magic-cursor {
+            position: fixed;
+            width: 32px;
+            height: 32px;
+            /* SVG incrustado de mariposa brillante */
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path fill="%23ffb3ff" d="M32,28 C26,10 4,12 12,32 C4,52 26,54 32,36 C38,54 60,52 52,32 C60,12 38,10 32,28 Z" style="filter: drop-shadow(0px 0px 4px %23ff66cc);"/></svg>') no-repeat center center;
+            background-size: contain;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            display: block;
+        }
+        
+        .sparkle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            box-shadow: 0 0 8px currentColor;
+            animation: fadeOutSparkle 0.9s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+        @keyframes fadeOutSparkle {
+            0% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -50%) translateY(25px) scale(0); opacity: 0; }
+        }
+
+        /* Ocultar el puntero de mariposa física en pantallas táctiles reales (móviles) */
+        @media (hover: none) and (pointer: coarse) {
+            #magic-cursor { display: none; }
+            body { cursor: auto; }
+        }
+
+        /* RESPONSIVO PARA MÓVILES */
+        @media (max-width: 650px) {
+            .card-flex, .card-flex.reverse {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .photo-container {
+                max-width: 100%;
+                width: 100%;
+            }
+            .header-title { font-size: 2.8rem; }
+            .header-subtitle { font-size: 3.3rem; }
+            .text-highlight-cursive { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="magic-cursor"></div>
+
+    <div class="container">
+        <h1 class="header-title">Para el amor</h1>
+        <h2 class="header-subtitle">de mi vida...</h2>
+        
+        <p class="intro-text">
+            Hay una pequeña mariposa mágica que quiere mostrarte un camino. <br>
+            Síguela, porque este viaje es para ti.
+        </p>
+
+        <button class="btn-empezar" id="btn-principal" onclick="abrirCarta(1)">Empezar viaje ✨</button>
+        <p class="song-info">🎵 Sonando: "Dos Oruguitas" - Sebastián Yatra</p>
+
+        <div class="step-card" id="paso-1">
+            <div class="step-badge">Paso 1 🦋</div>
+            <div class="card-flex">
+                <div class="photo-container">
+                    <img src="foto1.jpg" alt="Nuestra Foto 1" onerror="this.src='https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=600&auto=format&fit=crop'">
+                </div>
+                <div class="text-container">
+                    <h3 class="text-highlight-cursive">Desde que llegaste a mi vida, todo cambió para mejor.</h3>
+                    <p>Contigo descubrí lo que es reír sin razón, sentir paz en medio del caos y tener a alguien con quien quiero compartirlo todo.</p>
+                    <p class="text-gold">Gracias por existir, por elegirme y por hacerme tan feliz cada día.</p>
+                    <h4 class="text-footer-cursive">Eres mi lugar favorito. 💜</h4>
+                    <button class="btn-next" onclick="abrirCarta(2)">Continuar viaje 🦋</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card" id="paso-2">
+            <div class="step-badge">Paso 2 🦋</div>
+            <div class="card-flex reverse">
+                <div class="photo-container">
+                    <img src="foto2.jpg" alt="Nuestra Foto 2" onerror="this.src='https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=600&auto=format&fit=crop'">
+                </div>
+                <div class="text-container">
+                    <h3 class="text-highlight-cursive">Contigo, hasta los días más simples son inolvidables. ♡</h3>
+                    <p>Eres mi compañer@, mi cómplice, mi mejor amiga/o y la persona que me impulsa a ser mejor cada día. Gracias por tu amor, tu paciencia, tu apoyo incondicional y por estar siempre, en todo.</p>
+                    <p class="text-gold">No necesito tenerlo todo en la vida, porque contigo ya tengo lo que más importa.</p>
+                    <h4 class="text-footer-cursive">Te amo más de lo que las palabras alcanzan. 💕</h4>
+                    <button class="btn-next" onclick="abrirCarta(3)">Llegar al final 🦋</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="step-card" id="paso-3">
+            <div class="step-badge">Paso Final 🦋</div>
+            <div class="card-flex">
+                <div class="photo-container">
+                    <img src="foto3.jpg" alt="Nuestra Foto Final" onerror="this.src='https://images.unsplash.com/photo-1494972308805-463bc619b34e?q=80&w=600&auto=format&fit=crop'">
+                </div>
+                <div class="text-container">
+                    <h3 class="text-highlight-cursive" style="font-size: 2rem;">Gracias por ser mi oruguita, mi amor bonito. ♡</h3>
+                    <p>Eres esa personita que llegó a mi vida para quedarse y hacerla más bonita de lo que jamás imaginé.</p>
+                    <p style="margin-top: 10px;">Que Dios y nuestra Mamita siempre nos cuiden, nos guíen y nos llenen de bendiciones.</p>
+                    <p class="text-gold">Que este sea solo el comienzo de todo lo lindo que aún nos espera juntos. ♡</p>
+                    <h4 class="text-footer-cursive" style="color: #ffd700;">Siempre tú, siempre nosotros. ✨<br>Te amo infinitamente. 🤎</h4>
+                </div>
+            </div>
+        </div>
+
+        <p class="final-footer" id="final-lyrics">
+            "Dos oruguitas que se abrazan en la rama, ellas se quieren y se adoran..." 🍃
+        </p>
+    </div>
+
+    <script>
+        /* --- MANEJO DE APERTURAS --- */
+        function abrirCarta(paso) {
+            let targetCard;
+            
+            if (paso === 1) {
+                targetCard = document.getElementById('paso-1');
+                targetCard.classList.add('active');
+                document.getElementById('btn-principal').style.opacity = '0.4';
+                document.getElementById('btn-principal').style.pointerEvents = 'none';
+            } else if (paso === 2) {
+                targetCard = document.getElementById('paso-2');
+                targetCard.classList.add('active');
+                document.querySelector('#paso-1 .btn-next').style.display = 'none';
+            } else if (paso === 3) {
+                targetCard = document.getElementById('paso-3');
+                targetCard.classList.add('active');
+                document.getElementById('final-lyrics').style.display = 'block';
+                document.querySelector('#paso-2 .btn-next').style.display = 'none';
+            }
+
+            // Desplazamiento suave y preciso al centro de la nueva carta
+            setTimeout(() => {
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+
+        /* --- SISTEMA DE CURSOR MÁGICO Y RASTRO DE BRILLOS --- */
+        const cursor = document.getElementById('magic-cursor');
+        const colors = ['#ffd700', '#ff66cc', '#ffb3ff', '#ffffff', '#eec367'];
+
+        // Manejador para PCs (Movimiento de Mouse)
+        window.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+
+            if (Math.random() < 0.3) { 
+                createSparkle(e.clientX, e.clientY);
+            }
+        });
+
+        // Manejador para Móviles (Rastro al deslizar el dedo)
+        window.addEventListener('touchmove', (e) => {
+            if (e.touches.length > 0) {
+                let touch = e.touches[0];
+                if (Math.random() < 0.4) {
+                    createSparkle(touch.clientX, touch.clientY);
+                }
+            }
+        }, { passive: true });
+
+        function createSparkle(x, y) {
+            const sparkle = document.createElement('div');
+            sparkle.classList.add('sparkle');
+            
+            // Ligeros desfases naturales en la salida
+            let offsetX = (Math.random() - 0.5) * 12;
+            let offsetY = (Math.random() - 0.5) * 12;
+            sparkle.style.left = (x + offsetX) + 'px';
+            sparkle.style.top = (y + offsetY) + 'px';
+            
+            // Tamaños variados
+            let size = Math.random() * 6 + 3;
+            sparkle.style.width = size + 'px';
+            sparkle.style.height = size + 'px';
+
+            // Asignación de paleta de color y brillo
+            let chosenColor = colors[Math.floor(Math.random() * colors.length)];
+            sparkle.style.color = chosenColor;
+            sparkle.style.background = chosenColor;
+
+            document.body.appendChild(sparkle);
+
+            // Borrado del DOM automático para no consumir memoria
+            setTimeout(() => { sparkle.remove(); }, 900);
+        }
+    </script>
+</body>
+</html>
